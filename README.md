@@ -17,7 +17,7 @@ To change the 'world' configurations to include obstacles change the following v
 ```
 $ rosrun wheelchair_ds_motion simple_velocity_controller.py 8 0 1
 ```
-- parameters: <x-position of attractor> <y-position of attractor> <number of obstacles>  
+- parameters: ``<x-position of attractor> <y-position of attractor> <number of obstacles> ``
 
 Without obstacle avoidance, simply set the last parameter to 0.
   
