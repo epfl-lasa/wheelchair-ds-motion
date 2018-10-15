@@ -173,11 +173,6 @@ class VelocityController():
             vel = Twist()
             vel.linear.x = LA.norm(ds[:,0])/self.wheelRad
 
-            # if False:
-            #     # limit vibration when approaching attractor
-            #     print('Goal reached')
-            #     self.call_shutdown()
-            #     continue
             
             phi0 = self.robo_pos.theta
             phi1 = np.arctan2(ds[1,1], ds[0,1])
@@ -220,10 +215,6 @@ class VelocityController():
                 k_orig, pow_orig = 1, 1
                 obs_dVel = obs_dVel - np.array(self.obs[oo].x0)*(k_orig* np.abs(dist_origin-self.distLim_origin) )**(pow_orig) # exponentail border to stay inside
             self.obs[oo].xd = self.obs[oo].xd + obs_dVel
-            # print('vel', self.obs[oo].xd)
-            # print('obs_dVel', obs_dVel)
-            # print('dist or', dist_origin)
-            # print('dist or', dist_origin)
 
             norm_vel = LA.norm(self.obs[oo].xd)
             if norm_vel > self.velHuman_max: # maybe .. use soft limit?! 
@@ -242,9 +233,7 @@ class VelocityController():
                     self.obs[oo].xd = np.array([0,0])
                 else:
                     self.obs[oo].x0 = new_x0
-                    # print('new point')
-            # print(self.obs[oo])
-            # print('got nocollistion:', noCollision)
+
             pos = Pose2D()
             pos.x = self.obs[oo].x0[0]
             pos.y = self.obs[oo].x0[1]
@@ -255,10 +244,6 @@ class VelocityController():
     def callback_pos(self, msg): # Callback to get robots posisiton
         self.robo_pos = msg
         self.awaitingPos = False
-
-    # def callback_obs(self, msg, oo=0): # Callback to get robots posisiton
-        # self.obs_pos[oo] = msg
-        # self.awaitingObs[oo] = False
         
     def call_shutdown(self):
         vel = Twist()
