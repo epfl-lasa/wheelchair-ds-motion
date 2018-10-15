@@ -11,7 +11,7 @@ To change the 'world' configurations to include obstacles change the following v
 	<arg name="no_obstacle" default="true"/>
 	<arg name="one_obstacle" default="false"/>
 	<arg name="multi_obstacles" default="false"/>
-	```
+```
 
 **Step 2** To run a simple linear DS with obstacle avoidance:
 ```
