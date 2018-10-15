@@ -2,7 +2,7 @@
 DS-based motion planning (including obstacle avoidance) for the quickie-salsa wheelchair simulated in Gazebo.
 
 ## Instructions
-1. Bring-up Gazebo Wheelchair Simulator and RViz for DS Visualization
+**Step 1** Bring-up Gazebo Wheelchair Simulator and RViz for DS Visualization
 	```
 	$ roslaunch wheelchair_ds_motion ds_simulation.launch
 	```
@@ -13,7 +13,7 @@ DS-based motion planning (including obstacle avoidance) for the quickie-salsa wh
 		<arg name="multi_obstacles" default="false"/>
 	```
 
-2. To run a simple linear DS with obstacle avoidance:
+**Step 2** To run a simple linear DS with obstacle avoidance:
 	```
 	$ rosrun wheelchair_ds_motion simple_velocity_controller.py 8 0 1
 	```
