@@ -9,10 +9,10 @@
 #'''
 
 # Custom libraries
-# import sys 
-# lib_string = "/home/lukas/catkin_ws/src/obstacle_avoidance/scripts/lib/"
-# if not any (lib_string in s for s in sys.path):
-    # sys.path.append(lib_string)
+import sys 
+lib_string = "/home/nbfigueroa/catkin_ws/src/wheelchair-ds-motion/scripts/lib/"
+if not any (lib_string in s for s in sys.path):
+    sys.path.append(lib_string)
 
 # General MATH / Matrix calculation
 import numpy as np

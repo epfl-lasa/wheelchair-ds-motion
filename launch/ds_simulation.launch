@@ -1,17 +1,18 @@
 <?xml version="1.0"?>
 <launch>
-	<arg name="obstacle" default="true"/>
-	<arg name="one_obstacles" default="false"/>
+	<arg name="no_obstacle" default="true"/>
+	<arg name="one_obstacle" default="false"/>
 	<arg name="multi_obstacles" default="false"/>
 
 
 	<env name="GAZEBO_MODEL_PATH" value="$(find wheel_chair_model)/model:$(optenv GAZEBO_MODEL_PATH)"/>
-	<group if="$(arg obstacle)">
+	<group if="$(arg no_obstacle)">
 		<include file="$(find wheel_chair_model)/launch/empty_world.launch">
 			<arg name="world_name" value="$(find wheel_chair_model)/worlds/Wheelchair.world"/>
 		</include>
 	</group>
-	<group if="$(arg one_obstacles)">
+
+	<group if="$(arg one_obstacle)">
 		<include file="$(find wheel_chair_model)/launch/empty_world.launch">
 			<arg name="world_name" value="$(find wheel_chair_model)/worlds/Wheelchair_one_obstacle.world"/>
 		</include>
@@ -27,6 +28,10 @@
 	<node pkg="rostopic" type="rostopic" name="rostopic" args="pub -r 100 /quickie_wheel_Control_level std_msgs/Int64 'data: 7' "/>
 
 
-
+	<!-- RVIZ STUFF -->
+	<node name="static_tf_pub_world_to_gazebo_world" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0  0 0 0 1 world gazebo_world" />
+	<node name="robot_viz" pkg="wheelchair_ds_motion" type="robot_viz.py"/>
+	<node name="trajectory_viz" pkg="wheelchair_ds_motion" type="trajectory_viz.py"/>
+	<node type="rviz" name="rviz" pkg="rviz" args="-d $(find wheelchair_ds_motion)/config/rviz/wheelchair.rviz" />
 
 </launch>
