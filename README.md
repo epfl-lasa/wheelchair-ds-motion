@@ -15,7 +15,11 @@ To change the 'world' configurations to include obstacles change the following v
 
 **Step 2** To run a simple linear DS with obstacle avoidance:
 ```
-$ rosrun wheelchair_ds_motion simple_velocity_controller.py 8 0 1
+$ roslaunch wheelchair_ds_motion run_linearDS_controller.launch 
+```
+To define the attractor and if obstacles should be present or not, modify the following line:
+```xml
+<arg name="ctrl_command"   default="10 0 1" />
 ```
 - parameters: ``<x-position of attractor> <y-position of attractor> <number of obstacles> ``
 
