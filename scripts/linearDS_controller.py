@@ -28,7 +28,7 @@ import copy
 
 # ROS tools    
 import rospy
-from geometry_msgs.msg import Twist, Pose2D
+from geometry_msgs.msg import Twist, Pose2D, PointStamped
 
 # import copy # copying of lists 
 import sys # To pass argument to node
@@ -40,7 +40,7 @@ from dynamicalSystem_lib import constantVel_positionBased
 from dynamicalSystem_lib import linearAttractor_const
 
 class VelocityController():
-    def __init__(self, attr_x=0, attr_y=0, n_obs = 0, obs_pos=[[3,0]],dsController=False, freq=100, n_intSteps=20, dt_simu=0.1):
+    def __init__(self, attr_x=0, attr_y=0, n_obs = 1, obs_pos=[[3,0]],dsController=False, freq=100, n_intSteps=20, dt_simu=0.1):
         rospy.init_node('VelocityController' , anonymous=True)
         rospy.on_shutdown(self.call_shutdown) # shutdown command
         rate = rospy.Rate(freq) # Frequency
@@ -50,6 +50,7 @@ class VelocityController():
 
         self.dim = 2 # Dimensionaliyty of obstacle avoidance problem
         self.n_obs = int(n_obs) # number of obstacles, at the moment manually do automatic
+        print('self.pos_attr', self.n_obs)
 
         self.awaitingPos = True
         self.robo_pos = 0
@@ -59,7 +60,8 @@ class VelocityController():
         self.sub_attr = rospy.Subscriber("/Attractor_position", Pose2D, self.callback_attr)
 
         # Create velocity publisher
-        self.pub_vel = rospy.Publisher('cmd_vel', Twist, queue_size=10)
+        self.pub_vel = rospy.Publisher('cmd_vel',   Twist, queue_size=10)
+        self.pub_attr = rospy.Publisher('attractor', PointStamped, queue_size=10)
 
 
         # Human motion limits
@@ -80,29 +82,29 @@ class VelocityController():
         if self.n_obs > 0:
             self.awaitingObs = [True]*self.n_obs
             self.obs_pos = [0]*self.n_obs
-            self.pub_obs = [0]*self.n_obs
+            self.pub_obs = [0]*self.n_obs           
             for oo in range(self.n_obs):
                 self.pub_obs[oo] = rospy.Publisher("/Read_obstacle_Position/Desired_Pose_sphere"+str(oo+1), Pose2D, queue_size=10)            
+
             self.obs_read = 0.5 # [m]
-            self.obs_dim = [0.5,0.5] # [m]
+            self.obs_dim = [0.5,0.5] # [m]            
+ 
             # Initialize obstacles
-            if False: # Circular initial set up
-                self.dist_min = 2 # distance between obstacles
-                nR_obsPos = 5
+            if self.n_obs > 1: # Circular initial set up
+                R_obsPos = 7
                 for oo in range(self.n_obs):
                     self.obs_pos[oo] = Pose2D()
                     self.obs_pos[oo].x = R_obsPos*np.cos(2*pi/self.n_obs*oo)
                     self.obs_pos[oo].y = R_obsPos*np.sin(2*pi/self.n_obs*oo)
                     self.obs_pos[oo].theta = 0
                     self.pub_obs[oo].publish(self.obs_pos[oo])
-
-            if True:
+            if self.n_obs == 1:
                 for oo in range(self.n_obs):
                     self.obs_pos[oo] = Pose2D()
                     self.obs_pos[oo].x = obs_pos[oo][0]
-                    self.obs_pos[oo].y = obs_pos[oo][1]
+                    self.obs_pos[oo].y = obs_pos[oo][1]            
                     self.obs_pos[oo].theta = 0
-                    self.pub_obs[oo].publish(self.obs_pos[oo])                    
+                    self.pub_obs[oo].publish(self.obs_pos)                    
             
         while(self.awaitingPos):
             print('WAITING - missing robot position')
@@ -130,7 +132,6 @@ class VelocityController():
             # only for cirucla obstacles
             self.dist_min = self.obs[0].a[0]*2+0.01
 
-
         #################### MAIN CONTROL LOOP #################### 
         print('Starting loop.')
  
@@ -151,7 +152,6 @@ class VelocityController():
 
             # Initial velocity
             for ii in range(n_traj):
-                # ds_init = linearAttractor(pos[:,ii], x0=self.pos_attr)
                 ds_init = linearAttractor_const(pos[:,ii], x0=self.pos_attr, velConst=0.2)
                 
                 if self.n_obs > 0:
@@ -171,9 +171,7 @@ class VelocityController():
                 
             # Publish velocity
             vel = Twist()
-            vel.linear.x = LA.norm(ds[:,0])/self.wheelRad
-
-            
+            vel.linear.x = LA.norm(ds[:,0])/self.wheelRad            
             phi0 = self.robo_pos.theta
             phi1 = np.arctan2(ds[1,1], ds[0,1])
             dPhi = phi1-phi0
@@ -196,6 +194,16 @@ class VelocityController():
                 vel.linear.x = 0
 
             self.pub_vel.publish(vel)
+
+
+            # Publish Attractor
+            attractor = PointStamped()
+            attractor.header.frame_id = 'gazebo_world'
+            attractor.point.x = self.pos_attr[0]
+            attractor.point.y = self.pos_attr[1]
+            attractor.point.z = 0.25
+            self.pub_attr.publish(attractor)
+
             rate.sleep()
 
         print('finished')

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from geometry_msgs.msg import Pose2D
+from geometry_msgs.msg import Pose2D, Pose
 from std_msgs.msg import Header, ColorRGBA
 from visualization_msgs.msg import Marker
 import math
@@ -14,9 +14,10 @@ def wait_for_time():
 
 class ObjectViz(object):
     
-    def __init__(self, marker_pub):
+    def __init__(self, marker_pub, robot_pub):
         self._object_pose    = []
         self._marker_pub     = marker_pub    
+        self._robot_pub      = robot_pub
         rospy.on_shutdown(self.shutdown)
 
 
@@ -26,6 +27,7 @@ class ObjectViz(object):
         theta = msg.theta
         self._robot_pose = [x,y,theta];
         self.viz_cube()
+        self.pub_pose()
 
     def viz_cube(self):
        marker = Marker()
@@ -45,6 +47,17 @@ class ObjectViz(object):
        marker.pose.position.z = 0.5
        self._marker_pub.publish(marker)
     
+    def pub_pose(self):
+      robot = Pose()
+      robot.position.x = self._robot_pose[0]
+      robot.position.y = self._robot_pose[1]
+      robot.position.z = 0.0
+      robot.orientation.x = 0
+      robot.orientation.y = 0
+      robot.orientation.z = 0
+      robot.orientation.w = 1
+      self._robot_pub.publish(robot)
+
     def shutdown(self):
         """
         command executed after Ctrl+C is pressed
@@ -56,8 +69,9 @@ def main():
     rospy.init_node('robot_viz')
     wait_for_time()
     marker_publisher = rospy.Publisher('object_marker', Marker, queue_size=5)
+    robot_publisher  = rospy.Publisher('wheelchair_pose', Pose, queue_size=5)
     
-    objectViz = ObjectViz(marker_publisher)
+    objectViz = ObjectViz(marker_publisher, robot_publisher)
     rospy.Subscriber('/Read_joint_state/quickie_state', Pose2D, objectViz.callback)
     rospy.spin()
 

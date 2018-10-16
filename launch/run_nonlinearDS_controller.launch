@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+
+	<node name="trajectory_viz" pkg="wheelchair_ds_motion" type="trajectory_viz.py"/>
+	<node name="nonlinearDS_controller" pkg="wheelchair_ds_motion" type="nonlinearDS_controller.py"  output="screen"/>
+</launch>
