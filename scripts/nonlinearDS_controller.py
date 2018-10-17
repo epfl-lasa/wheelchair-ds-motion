@@ -40,38 +40,31 @@ from dynamicalSystem_lib import constantVel_positionBased
 from dynamicalSystem_lib import linearAttractor_const
 
 class VelocityController():
-    def __init__(self, attr_x=0, attr_y=0, n_obs = 1, obs_pos=[[3,0]],dsController=False, freq=100, n_intSteps=20, dt_simu=0.1):
+    def __init__(self, n_obs = 0, obs_pos=[[9,0]],dsController=False, freq=100, n_intSteps=20, dt_simu=0.1):
         rospy.init_node('VelocityController' , anonymous=True)
         rospy.on_shutdown(self.call_shutdown) # shutdown command
         rate = rospy.Rate(freq) # Frequency
+
+        # Class variables
         self.dt = 1./freq
-
-        attr = [float(attr_x), float(attr_y)]
-
         self.dim = 2 # Dimensionaliyty of obstacle avoidance problem
         self.n_obs = int(n_obs) # number of obstacles, at the moment manually do automatic
-        print('self.pos_attr', self.n_obs)
-
         self.awaitingPos = True
         self.robo_pos = 0
+        self.ds_vel   = 0
         
         # Create position subscriber
-        self.sub_pos = rospy.Subscriber("/Read_joint_state/quickie_state", Pose2D, self.callback_pos)
-        self.sub_attr = rospy.Subscriber("/Attractor_position", Pose2D, self.callback_attr)
+        self.sub_pos    = rospy.Subscriber("/Read_joint_state/quickie_state", Pose2D, self.callback_pos)
+        self.sub_ds_vel = rospy.Subscriber("/ds_cmd_vel", Twist, self.callback_ds)
+        self.sub_ds_att = rospy.Subscriber("/ds1/DS/target", PointStamped, self.callback_attr)
 
         # Create velocity publisher
-        self.pub_vel = rospy.Publisher('cmd_vel',   Twist, queue_size=10)
-        self.pub_attr = rospy.Publisher('attractor', PointStamped, queue_size=10)
-
+        self.pub_vel  = rospy.Publisher('cmd_vel',   Twist, queue_size=10)
 
         # Human motion limits
         self.velHuman_max =3.0/3.6
         self.velHuman_lim = 5.0/3.6 # [m/s]
-        self.distLim_origin = 4 # [m]
-
-        # Attractor position
-        self.pos_attr = np.array(attr)
-        print('self.pos_attr', self.pos_attr)
+        self.distLim_origin = 6 # [m]
 
         # Robot and environment gemoetry
         self.wheelRad = 0.155  # [m]
@@ -104,7 +97,7 @@ class VelocityController():
                     self.obs_pos[oo].x = obs_pos[oo][0]
                     self.obs_pos[oo].y = obs_pos[oo][1]            
                     self.obs_pos[oo].theta = 0
-                    self.pub_obs[oo].publish(self.obs_pos)                    
+                    self.pub_obs[oo].publish(self.obs_pos[oo])                    
             
         while(self.awaitingPos):
             print('WAITING - missing robot position')
@@ -138,7 +131,7 @@ class VelocityController():
         # Prepare variables before loop
         n_traj = 2
         pos = np.zeros((self.dim, n_traj+1))
-        ds = np.zeros((self.dim, n_traj))
+        ds  = np.zeros((self.dim, n_traj))
         while not rospy.is_shutdown(): 
                         
             if self.n_obs > 0:
@@ -152,11 +145,14 @@ class VelocityController():
 
             # Initial velocity
             for ii in range(n_traj):
-                ds_init = linearAttractor_const(pos[:,ii], x0=self.pos_attr, velConst=0.2)
+                # Velocity from non-linear DS
+                ds_init = np.array([self.ds_vel.linear.x, self.ds_vel.linear.y])
+                velFactor = 0.8
+                ds_init = ds_init /np.linalg.norm(ds_init)*velFactor
                 
                 if self.n_obs > 0:
                     ds_mod = obs_avoidance_interpolation(pos[:,ii], ds_init, self.obs, 
-                                                     vel_lim=0.2, attractor=self.pos_attr)
+                                                     vel_lim=0.8, attractor=self.pos_attr)
                     print('ds mod', ds_mod)
                     print('mag ds mod', LA.norm(ds_mod) )
                 else:
@@ -194,16 +190,6 @@ class VelocityController():
                 vel.linear.x = 0
 
             self.pub_vel.publish(vel)
-
-
-            # Publish Attractor
-            attractor = PointStamped()
-            attractor.header.frame_id = 'gazebo_world'
-            attractor.point.x = self.pos_attr[0]
-            attractor.point.y = self.pos_attr[1]
-            attractor.point.z = 0.25
-            self.pub_attr.publish(attractor)
-
             rate.sleep()
 
         print('finished')
@@ -211,37 +197,33 @@ class VelocityController():
 
     def update_obsPosition(self):
         for oo in range(self.n_obs):
-            # To imrove: dominance of first robot
-            w_rand = 0.004
-            # obs_dVel = np.random.normal(scale=w_rand, size=(2))
-            # print(random.uniform(0,w_rand))
-            obs_dVel = np.array([random.uniform(-w_rand,w_rand), random.uniform(-w_rand,w_rand)])
-            # print('vel rand', obs_dVel)
-            dist_origin = LA.norm(np.array(self.obs[oo].x0))
-            # print('enter loop')            
-            if dist_origin > self.distLim_origin: # obstacle far away
-                k_orig, pow_orig = 1, 1
-                obs_dVel = obs_dVel - np.array(self.obs[oo].x0)*(k_orig* np.abs(dist_origin-self.distLim_origin) )**(pow_orig) # exponentail border to stay inside
-            self.obs[oo].xd = self.obs[oo].xd + obs_dVel
+        #     # To imrove: dominance of first robot
+        #     w_rand = 0.004
+        #     obs_dVel = np.array([random.uniform(-w_rand,w_rand), random.uniform(-w_rand,w_rand)])
+        #     dist_origin = LA.norm(np.array(self.obs[oo].x0))        
+        #     if dist_origin > self.distLim_origin: # obstacle far away
+        #         k_orig, pow_orig = 1, 1
+        #         obs_dVel = obs_dVel - np.array(self.obs[oo].x0)*(k_orig* np.abs(dist_origin-self.distLim_origin) )**(pow_orig) # exponentail border to stay inside
+        #     self.obs[oo].xd = self.obs[oo].xd + obs_dVel
 
-            norm_vel = LA.norm(self.obs[oo].xd)
-            if norm_vel > self.velHuman_max: # maybe .. use soft limit?! 
-                self.obs[oo].xd = self.velHuman_max / norm_vel*self.obs[oo].xd
-            new_x0 = self.obs[oo].x0 + self.obs[oo].xd*self.dt
+        #     norm_vel = LA.norm(self.obs[oo].xd)
+        #     if norm_vel > self.velHuman_max: # maybe .. use soft limit?! 
+        #         self.obs[oo].xd = self.velHuman_max / norm_vel*self.obs[oo].xd
+        #     new_x0 = self.obs[oo].x0 + self.obs[oo].xd*self.dt
 
-            noCollision = True
-            for pp in range(self.n_obs):
-                if not(pp==oo) and self.dist_min > LA.norm(new_x0 - np.array(self.obs[pp].x0) ):
-                    noCollision = False
-                    self.obs[oo].xd = np.array([0,0])
-                    return
-            if noCollision: # Check distance to robot, don't bump into it
-                if self.dist_min*0.5 > LA.norm(np.array([self.robo_pos.x, self.robo_pos.y]) 
-                                           - np.array(self.obs[oo].x0) ):
-                    self.obs[oo].xd = np.array([0,0])
-                else:
-                    self.obs[oo].x0 = new_x0
-
+        #     noCollision = True
+        #     for pp in range(self.n_obs):
+        #         if not(pp==oo) and self.dist_min > LA.norm(new_x0 - np.array(self.obs[pp].x0) ):
+        #             noCollision = False
+        #             self.obs[oo].xd = np.array([0,0])
+        #             return
+        #     if noCollision: # Check distance to robot, don't bump into it
+        #         if self.dist_min*0.5 > LA.norm(np.array([self.robo_pos.x, self.robo_pos.y]) 
+        #                                    - np.array(self.obs[oo].x0) ):
+        #             self.obs[oo].xd = np.array([0,0])
+        #         else:
+        #             self.obs[oo].x0 = new_x0
+            self.obs[oo].xd = np.array([0,0])
             pos = Pose2D()
             pos.x = self.obs[oo].x0[0]
             pos.y = self.obs[oo].x0[1]
@@ -253,11 +235,13 @@ class VelocityController():
         self.robo_pos = msg
         self.awaitingPos = False
         
+    def callback_ds(self, msg): 
+        self.ds_vel = msg
+
     def call_shutdown(self):
         vel = Twist()
         vel.linear.x = 0
         vel.angular.z = 0
-
         self.pub_vel.publish(vel)
 
         rospy.loginfo('Zero velocity command after shutdown.')
@@ -270,16 +254,13 @@ class VelocityController():
         return dist_min > dist
 
     def callback_attr(self, msg):
-        self.pos_attr = np.array([msg.x, msg.y])
+        self.pos_attr = np.array([msg.point.x, msg.point.y])
         
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print("!REMARK! --- possible usage with attractor x=1 & y=2: trajectory_planner.py 1 2")
-        VelocityController()
-    elif len(sys.argv) < 4:
-        VelocityController(sys.argv[1], sys.argv[2])
-    else:
-        VelocityController(sys.argv[1], sys.argv[2], sys.argv[3])
+    if len(sys.argv) < 2:        
+        VelocityController(0)
+    elif len(sys.argv) < 3:
+        VelocityController(sys.argv[1])
 
 

@@ -1,6 +1,14 @@
 <?xml version="1.0"?>
 <launch>
+	
+	# Load DS Motion Generator
+	<include file="$(find wheelchair_ds_motion)/launch/load_lpvDS_motionGenerator.launch">
+		<arg name="DS_name" value="2D-W-Nav-2"/>
+	</include>
+	
+	# Take Desired Velocity from DS and send it to wheelchair (with obstacle avoidance)
+	<!-- <node name="nonlinearDS_controller" pkg="wheelchair_ds_motion" type="nonlinearDS_controller.py"  args="$(arg ctrl_command)" output="screen"/> -->
 
+	# Visualize Wheelchair trajectory
 	<node name="trajectory_viz" pkg="wheelchair_ds_motion" type="trajectory_viz.py"/>
-	<node name="nonlinearDS_controller" pkg="wheelchair_ds_motion" type="nonlinearDS_controller.py"  output="screen"/>
 </launch>

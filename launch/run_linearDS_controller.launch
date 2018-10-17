@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-	<arg name="ctrl_command"   default="10 0 0" />
+	<arg name="ctrl_command"   default="0 0 0" />
 	<node name="trajectory_viz" pkg="wheelchair_ds_motion" type="trajectory_viz.py"/>
 	<node name="linearDS_velocity_controller" pkg="wheelchair_ds_motion" type="linearDS_controller.py" args="$(arg ctrl_command)" output="screen"/>
 </launch>

@@ -152,7 +152,7 @@ class VelocityController():
 
             # Initial velocity
             for ii in range(n_traj):
-                ds_init = linearAttractor_const(pos[:,ii], x0=self.pos_attr, velConst=0.2)
+                ds_init = linearAttractor_const(pos[:,ii], x0=self.pos_attr, velConst=0.8)
                 
                 if self.n_obs > 0:
                     ds_mod = obs_avoidance_interpolation(pos[:,ii], ds_init, self.obs, 
