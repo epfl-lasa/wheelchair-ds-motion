@@ -27,21 +27,22 @@ Without obstacle avoidance, simply set the last parameter to 0.
   
 
 **Step 2 (Option 2)** To run a non-linear DS (lpv formulation) with streamline visualization in rviz:
-```
-$ roslaunch wheelchair_ds_motion run_nonlinearDS_controller.launch 
-```
-The attractor and type of DS must are set in this parameter:
-```xml
-arg name="DS_name" value="2D-W-Nav-2"/>
-```
-which points to the ``.yml`` file in the [ds-motion-generator](https://github.com/epfl-lasa/ds_motion_generator) package.
+- Load the DS model
+	```
+	$ roslaunch wheelchair_ds_motion run_nonlinearDS_controller.launch 
+	```
+	The attractor and type of DS must are set in this parameter:
+	```xml
+	arg name="DS_name" value="2D-W-Nav-2"/>
+	```
+	which points to the ``.yml`` file in the [ds-motion-generator](https://github.com/epfl-lasa/ds_motion_generator) package.
 
-To control the wheelchair with this loaded DS, run the following command:
-```
-$ rosrun wheelchair_ds_motion nonlinearDS_controller.py
-```
-To define if obstacle should be present or not, add the following argument:
-```
-$ rosrun wheelchair_ds_motion nonlinearDS_controller.py <number of obstacles> 
-```
+- Control the wheelchair with this loaded DS, run the following command:
+	```
+	$ rosrun wheelchair_ds_motion nonlinearDS_controller.py
+	```
+	To define if obstacle should be present or not, add the following argument:
+	```
+	$ rosrun wheelchair_ds_motion nonlinearDS_controller.py <number of obstacles> 
+	```
 
