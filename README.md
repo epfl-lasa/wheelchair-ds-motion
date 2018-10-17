@@ -43,6 +43,6 @@ Without obstacle avoidance, simply set the last parameter to 0.
 	```
 	To define if obstacle should be present or not, add the following argument:
 	```
-	$ rosrun wheelchair_ds_motion nonlinearDS_controller.py <number of obstacles> 
+	$ rosrun wheelchair_ds_motion nonlinearDS_controller.py 1
 	```
 
