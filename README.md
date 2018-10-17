@@ -33,7 +33,7 @@ Without obstacle avoidance, simply set the last parameter to 0.
 	```
 	The attractor and type of DS must are set in this parameter:
 	```xml
-	arg name="DS_name" value="2D-W-Nav-2"/>
+	<arg name="DS_name" value="2D-W-Nav-2"/>
 	```
 	which points to the ``.yml`` file in the [ds-motion-generator](https://github.com/epfl-lasa/ds_motion_generator) package.
 
