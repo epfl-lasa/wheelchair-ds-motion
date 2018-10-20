@@ -185,7 +185,8 @@ class VelocityController():
             dPhi_max = 40./180*pi
             if np.abs(dPhi) > dPhi_max:
                 dPhi = np.copysign(dPhi_max, dPhi)
-                vel.linear.x = 0
+                # vel.linear.x = 0
+                vel.linear.x = vel.linear.x/50
                 print('WAIT -- repositioning')
             
             vel.angular.z = dPhi*0.8
