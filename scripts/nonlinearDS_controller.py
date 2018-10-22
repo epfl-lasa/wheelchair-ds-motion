@@ -34,7 +34,7 @@ class VelocityController():
         rospy.on_shutdown(self.call_shutdown) 
         rate = rospy.Rate(freq) 
 
-        # Class variables
+        # Class variablesd
         self.dt = 1./freq
         self.dim = 2
         self.awaitingPos = True
@@ -75,7 +75,7 @@ class VelocityController():
             phi1 = np.arctan2(ds[1,1], ds[0,1])
             dPhi = phi1-phi0
 
-            # correct for disoncitnuity at -pi/pi
+            # correct for discontinuity at -pi/pi
             while dPhi > pi: 
                 dPhi = pi-2*pi
             while dPhi < -pi:
@@ -108,7 +108,7 @@ class VelocityController():
         vel.angular.z = 0
         self.pub_vel.publish(vel)
         rospy.loginfo('Zero velocity command after shutdown.')
-        
+
     def callback_attr(self, msg):
         self.pos_attr = np.array([msg.point.x, msg.point.y])
         

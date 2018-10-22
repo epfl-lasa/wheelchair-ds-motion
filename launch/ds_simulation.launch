@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
 <launch>
-	<arg name="world" default=""/>
+	<arg name="world" default="_road"/>
 	# Example Options:
-  	- _one_obstacle
-  	- _multiple_obstacles 
+  	- _road
 
 	<env name="GAZEBO_MODEL_PATH" value="$(find wheel_chair_model)/model:$(optenv GAZEBO_MODEL_PATH)"/>
 
