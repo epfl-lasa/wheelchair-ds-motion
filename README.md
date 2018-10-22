@@ -1,19 +1,40 @@
 # wheelchair-ds-motion
-DS-based motion planning (including obstacle avoidance) for the quickie-salsa wheelchair simulated in Gazebo.
+DS-based motion planning for the quickie-salsa wheelchair simulated in Gazebo, as shown below:
 
-## Instructions
-**Step 1** Bring-up Gazebo Wheelchair Simulator and RViz for DS Visualization  
+<p align="center">
+<img src="https://github.com/epfl-lasa/wheelchair-ds-motion/blob/master/figs/Road1-scenario.png" width="750"></>
+
+### Dependencies
+To run this package you must install the following dependencies:
+- [quickie-salsa-m2](https://github.com/sinamr66/quickie_salsa_m2) ``checkout 'nadia' branch`` | Control Interface for Quicki-Salsa Wheelchair in Gazebo
+- [ds-motion-generator](https://github.com/epfl-lasa/ds_motion_generator.git) ``checkout 'nadia' branch`` | DS motion generation nodes
+- [lpvDS-lib](https://github.com/nbfigueroa/lpvDS-lib) | lpv-DS class used by ds-motion-generator, should be installed automatically if using ``wstool`` with the [ds-motion-generator](https://github.com/epfl-lasa/ds_motion_generator.git) package.
+
+
+### Instructions
+**Step 1** Bring-up Gazebo Wheelchair Simulator of the Road World and RViz for DS Visualization  
 ```
-$ roslaunch wheelchair_ds_motion ds_simulation.launch
-```
-To change the 'world' configurations to include obstacles change the following variables:
-```xml
-	<arg name="no_obstacle" default="true"/>
-	<arg name="one_obstacle" default="false"/>
-	<arg name="multi_obstacles" default="false"/>
+$ roslaunch wheelchair_ds_motion ds_simulation.launch world:=_road
 ```
 
-**Step 2 (Option 1)** To run a simple linear DS with obstacle avoidance:
+**Step 2** To run a non-linear DS (lpv formulation) with streamline visualization in rviz:
+- Load the DS model
+	```
+	$ roslaunch wheelchair_ds_motion run_nonlinearDS_controller.launch 
+	```
+	The attractor and type of DS must are set in "DS_name" parameter, there are currently 2 options:
+	```xml
+	<arg name="DS_name" value="2D-W-Nav"/>
+	<arg name="DS_name" value="2D-U-Nav"/>
+	```
+	which points to the ``.yml`` file in the [ds-motion-generator](https://github.com/epfl-lasa/ds_motion_generator) package.
+
+- To control the wheelchair with the loaded DS, run the following command:
+	```
+	$ rosrun wheelchair_ds_motion nonlinearDS_controller.py
+	```
+
+**Optional** To run a simple linear DS with a pre-defined attractor:
 ```
 $ roslaunch wheelchair_ds_motion run_linearDS_controller.launch 
 ```
@@ -24,25 +45,3 @@ To define the attractor and if obstacles should be present or not, modify the fo
 - parameters: ``<x-position of attractor> <y-position of attractor> <number of obstacles> ``
 
 Without obstacle avoidance, simply set the last parameter to 0.
-  
-
-**Step 2 (Option 2)** To run a non-linear DS (lpv formulation) with streamline visualization in rviz:
-- Load the DS model
-	```
-	$ roslaunch wheelchair_ds_motion run_nonlinearDS_controller.launch 
-	```
-	The attractor and type of DS must are set in this parameter:
-	```xml
-	<arg name="DS_name" value="2D-W-Nav-2"/>
-	```
-	which points to the ``.yml`` file in the [ds-motion-generator](https://github.com/epfl-lasa/ds_motion_generator) package.
-
-- Control the wheelchair with this loaded DS, run the following command:
-	```
-	$ rosrun wheelchair_ds_motion nonlinearDS_controller.py
-	```
-	To define if obstacle should be present or not, add the following argument:
-	```
-	$ rosrun wheelchair_ds_motion nonlinearDS_controller.py 1
-	```
-
