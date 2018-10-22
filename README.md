@@ -6,7 +6,7 @@ DS-based motion planning for the quickie-salsa wheelchair simulated in Gazebo, a
 
 ### Dependencies
 To run this package you must install the following dependencies:
-- [quickie-salsa-m2](https://github.com/sinamr66/quickie_salsa_m2) ``checkout 'nadia' branch`` | Control Interface for Quicki-Salsa Wheelchair in Gazebo
+- [quickie-salsa-m2](https://github.com/sinamr66/quickie_salsa_m2) ``checkout 'nadia' branch`` | Control Interface for Quickie-Salsa Wheelchair in Gazebo
 - [ds-motion-generator](https://github.com/epfl-lasa/ds_motion_generator.git) ``checkout 'nadia' branch`` | DS motion generation nodes
 - [lpvDS-lib](https://github.com/nbfigueroa/lpvDS-lib) | lpv-DS class used by ds-motion-generator, should be installed automatically if using ``wstool`` with the [ds-motion-generator](https://github.com/epfl-lasa/ds_motion_generator.git) package.
 
