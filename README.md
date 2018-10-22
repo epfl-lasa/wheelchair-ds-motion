@@ -34,6 +34,8 @@ $ roslaunch wheelchair_ds_motion ds_simulation.launch world:=_road
 	$ rosrun wheelchair_ds_motion nonlinearDS_controller.py
 	```
 
+To learn your own lpv-DS models, download and follow the instructions in the [ds-opt](https://github.com/nbfigueroa/ds-opt) package. 
+
 **Optional** To run a simple linear DS with a pre-defined attractor:
 ```
 $ roslaunch wheelchair_ds_motion run_linearDS_controller.launch 
