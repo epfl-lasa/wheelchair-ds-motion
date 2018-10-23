@@ -47,3 +47,11 @@ To define the attractor and if obstacles should be present or not, modify the fo
 - parameters: ``<x-position of attractor> <y-position of attractor> <number of obstacles> ``
 
 Without obstacle avoidance, simply set the last parameter to 0.
+
+**References**   
+> [1] Figueroa, N. and Billard, A. (2018) "A Physically-Consistent Bayesian Non-Parametric Mixture Model for Dynamical System Learning". Conference on Robot Learning (CoRL) - 2018 Edition. To Appear. 
+
+**Contact**: [Nadia Figueroa](http://lasa.epfl.ch/people/member.php?SCIPER=238387) (nadia.figueroafernandez AT epfl dot ch)
+
+**Acknowledgments**
+This work was supported by the EU project [Cogimon](https://cogimon.eu/cognitive-interaction-motion-cogimon) H2020-ICT-23-2014 and [Crowdbot](https://project.inria.fr/crowdbot/) H2020-ICT-25-2016-2017.
