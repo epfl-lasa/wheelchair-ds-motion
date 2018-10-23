@@ -3,7 +3,7 @@
 	
 	# Load DS Motion Generator
 	<include file="$(find wheelchair_ds_motion)/launch/load_lpvDS_motionGenerator.launch">
-		<arg name="DS_name" value="2D-W-Nav"/>
+		<arg name="DS_name" value="2D-U-Nav"/>
 	</include>
 	# Example Options:
   - 2D-W-Nav
