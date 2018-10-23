@@ -2,7 +2,7 @@
 DS-based motion planning for the quickie-salsa wheelchair simulated in Gazebo, as shown below:
 
 <p align="center">
-<img src="https://github.com/epfl-lasa/wheelchair-ds-motion/blob/master/figs/Road1-scenario.png" width="750"></>
+<img src="https://github.com/epfl-lasa/wheelchair-ds-motion/blob/master/figs/road1-W-auto.gif" width="750"></>
 
 ### Dependencies
 To run this package you must install the following dependencies:
