@@ -22,7 +22,7 @@ $ roslaunch wheelchair_ds_motion ds_simulation.launch world:=_road
 	```
 	$ roslaunch wheelchair_ds_motion run_nonlinearDS_controller.launch 
 	```
-	The attractor and type of DS must are set in "DS_name" parameter, there are currently 2 options:
+	The attractor and type of DS are set in "DS_name" parameter, there are currently 2 options:
 	```xml
 	<arg name="DS_name" value="2D-W-Nav"/>
 	<arg name="DS_name" value="2D-U-Nav"/>
